@@ -1,0 +1,14 @@
+# Blender MTL File: 'small_table.blend'
+# Material Count: 1
+
+newmtl blinn1
+Ns 56.806129
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\Users\\mathi\\Dev\\Python\\Ursina\\TobiasEllis\\private\\Documents\\maya\\projects\\default\\scenes\\textures\\table_1001_Normal.tga
+map_Kd C:\\Users\\mathi\\Dev\\Python\\Ursina\\TobiasEllis\\private\\Documents\\maya\\projects\\default\\scenes\\textures\\table_1001_Diffuse.tga

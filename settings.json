@@ -1,0 +1,24 @@
+{
+  "fullscreen": true,
+  "vsync": false,
+  "framerate_cap": null,
+  "rich_presence_enabled": true,
+  "sensitivity": 100,
+  "controls": {
+    "forward": "z",
+    "backward": "s",
+    "left": "q",
+    "right": "d",
+    "jump": "space",
+    "run": "shift",
+    "crouch": "control"
+  },
+  "customization": {
+    "FPS_counter_visible": true,
+    "crosshair_enabled": false,
+    "crosshair_RGBA": [0, 255, 0, 255]
+  },
+  "graphics": {
+    "FOV": 90
+  }
+}
