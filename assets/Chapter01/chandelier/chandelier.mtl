@@ -1,0 +1,16 @@
+# Blender MTL File: 'chandelier.blend'
+# Material Count: 1
+
+newmtl chandelier
+Ns 86.470579
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.000000
+illum 1
+map_Bump D:\\Моделирование\\Blender Projects\\gdev\\кандилябр\\chandelier\\chandelier_blend\\chandelier_normal.png
+map_Kd D:\\Моделирование\\Blender Projects\\gdev\\кандилябр\\chandelier\\chandelier_blend\\textures\\chandelier_metalness.png
+map_Ks D:\\Моделирование\\Blender Projects\\gdev\\кандилябр\\chandelier\\chandelier_blend\\textures\\chandelier_specular.png
+map_Ns D:\\Моделирование\\Blender Projects\\gdev\\кандилябр\\chandelier\\chandelier_blend\\textures\\chandelier_specular.png

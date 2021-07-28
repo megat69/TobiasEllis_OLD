@@ -1,0 +1,12 @@
+# Blender MTL File: 'broken_wine_bottle.blend'
+# Material Count: 1
+
+newmtl _Botella_1hdd
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.136691 0.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.837264
+illum 9

@@ -1,0 +1,48 @@
+# Blender MTL File: 'armoire.blend'
+# Material Count: 4
+
+newmtl Doors_only
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump D:\\substance to blender\\Furniture\\cabinet 3 glass and lead\\doors only\\cabinet 3 door_wood_Normal.png
+map_Ns D:\\substance to blender\\Furniture\\cabinet 3 glass and lead\\doors only\\cabinet 3 door_wood_Roughness.png
+refl D:\\substance to blender\\Furniture\\cabinet 3 glass and lead\\doors only\\cabinet 3 door_wood_Metallic.png
+
+newmtl Material.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.122612 0.122612 0.122612
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+
+newmtl grey_dirt
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl wood
+Ns 167.114385
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump D:\\substance to blender\\Furniture\\cabinet 3 glass and lead\\cabinet 3 glass and lead 2_WoodFine26_3K.001_Normal.png
+map_Kd D:\\substance to blender\\Furniture\\cabinet 3 glass and lead\\cabinet 3 glass and lead 2_WoodFine26_3K.001_BaseColor.png
+map_Ns D:\\substance to blender\\Furniture\\cabinet 3 glass and lead\\cabinet 3 glass and lead 2_WoodFine26_3K.001_Roughness.png

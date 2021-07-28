@@ -37,7 +37,7 @@ def generate_map(file, scene, player=None):
                     data[key] = color.color(*data[key]["value"])
                 else:
                     raise Exception("Color format not supported !")
-            elif key == "shader":
+            elif key == "shader" and mesh["type"] == "entity":
                 data[key] = lit_with_shadows_shader if data[key] is True else None
 
         # Building the mesh
@@ -45,5 +45,7 @@ def generate_map(file, scene, player=None):
             Entity(parent=scene, **data)
         elif mesh["type"] == "DirectionalLight":
             DirectionalLight(parent=scene, **data)
+        elif mesh["type"] == "AmbientLight":
+            AmbientLight(parent=scene, **data)
         else:
             raise Exception("Mesh type not supported.")

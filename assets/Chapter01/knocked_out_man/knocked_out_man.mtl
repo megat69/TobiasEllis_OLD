@@ -1,0 +1,30 @@
+# Blender MTL File: 'knocked_out_man.blend'
+# Material Count: 2
+
+newmtl Ch28_body
+Ns 179.999996
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Normal.png
+map_Kd C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Diffuse.png
+map_Ks C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Specular.png
+map_Ns C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Glossiness.png
+map_d C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Diffuse.png
+
+newmtl Ch28_hair
+Ns 179.999996
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Normal.png
+map_Kd C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Diffuse.png
+map_d C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_a3aa8092-ed75-4240-b0b9-7a7fb6649d32.fbm\\Ch28_1001_Diffuse.png

@@ -11,7 +11,8 @@
     "right": "d",
     "jump": "space",
     "run": "shift",
-    "crouch": "control"
+    "crouch": "control",
+    "interact": "e"
   },
   "customization": {
     "FPS_counter_visible": true,
