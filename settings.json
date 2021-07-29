@@ -12,7 +12,9 @@
     "jump": "space",
     "run": "shift",
     "crouch": "control",
-    "interact": "e"
+    "interact": "e",
+    "hold_crouch": false,
+    "hold_sprint": false
   },
   "customization": {
     "FPS_counter_visible": true,

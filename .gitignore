@@ -131,3 +131,5 @@ dmypy.json
 
 # Private folder
 private/
+models_compressed/
+compiled_output/

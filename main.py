@@ -72,6 +72,8 @@ class FirstPersonController(Entity):
         camera.fov = GRAPHICS["FOV"]
         mouse.locked = True
         self.mouse_sensitivity = Vec2(settings["sensitivity"], settings["sensitivity"])
+        self.is_crouched = False
+        self.is_sprinting = False
 
         # Character model
         self.character_model = Entity(parent=self, model="assets/Character.obj", position=(0, -3.2, -0.1),
@@ -85,6 +87,9 @@ class FirstPersonController(Entity):
         self.jumping = False
         self.air_time = 0
         self.movement_allowed = True
+        self.sprinting_speed = 8
+        self.walking_speed = 5
+        self.crouched_speed = 2
 
         self.inventory = []
         self.inventory_display = []
@@ -113,17 +118,17 @@ class FirstPersonController(Entity):
     def update(self):
         if self.movement_allowed is True:
             # Running
-            if held_keys[CONTROLS["run"]]:
-                self.speed = 8
-            else:
-                self.speed = 5
+            if held_keys[CONTROLS["run"]] and CONTROLS["hold_sprint"] is True:
+                self.speed = self.sprinting_speed
+            elif CONTROLS["hold_sprint"] is True:
+                self.speed = self.walking_speed
 
             # Crouching
-            if held_keys[CONTROLS["crouch"]]:
+            if held_keys[CONTROLS["crouch"]] and CONTROLS["hold_crouch"] is True:
                 self.camera_pivot.y = 1
                 self.character_model.y = -4.2
-                self.speed = 2
-            else:
+                self.speed = self.crouched_speed
+            elif CONTROLS["hold_crouch"] is True:
                 self.camera_pivot.y = 2
                 self.character_model.y = -3.2
 
@@ -181,6 +186,26 @@ class FirstPersonController(Entity):
     def input(self, key):
         if key == CONTROLS["jump"]:
             self.jump()
+
+        if key == CONTROLS["run"] and CONTROLS["hold_sprint"] is False:
+            self.is_sprinting = not self.is_sprinting
+            self.speed = self.sprinting_speed if self.is_sprinting is True else self.walking_speed
+            if self.is_crouched is True:
+                self.camera_pivot.y = 2
+                self.character_model.y = -3.2
+                self.is_crouched = False
+
+        if key == CONTROLS["crouch"] and CONTROLS["hold_crouch"] is False:
+            self.is_crouched = not self.is_crouched
+            if self.is_crouched is True:
+                self.is_sprinting = False
+                self.speed = self.crouched_speed
+                self.camera_pivot.y = 1
+                self.character_model.y = -4.2
+            else:
+                self.speed = self.walking_speed
+                self.camera_pivot.y = 2
+                self.character_model.y = -3.2
 
     def jump(self):
         if self.grounded is False:
@@ -241,8 +266,6 @@ if save_info["current_chapter"] == "01":
                 invoke(setattr, hider, "visible", True, delay=19.3)
                 invoke(intro_music.stop, delay=23.5)
                 # TODO fade out : intro_music.fade_out(duration=0.7, delay=23.5)
-
-
 
         def input(self, key):
             if self.hovered:
@@ -355,6 +378,7 @@ if __name__ == "__main__":
 
 
     # TODO : Dynamic LODs for wall textures
+    # TODO : Gamepad support
 
     # Runs the app
     app.run()
