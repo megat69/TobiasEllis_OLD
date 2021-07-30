@@ -117,20 +117,18 @@ class FirstPersonController(Entity):
 
     def update(self):
         if self.movement_allowed is True:
-            # Running
-            if held_keys[CONTROLS["run"]] and CONTROLS["hold_sprint"] is True:
-                self.speed = self.sprinting_speed
-            elif CONTROLS["hold_sprint"] is True:
-                self.speed = self.walking_speed
-
             # Crouching
-            if held_keys[CONTROLS["crouch"]] and CONTROLS["hold_crouch"] is True:
-                self.camera_pivot.y = 1
-                self.character_model.y = -4.2
-                self.speed = self.crouched_speed
-            elif CONTROLS["hold_crouch"] is True:
-                self.camera_pivot.y = 2
-                self.character_model.y = -3.2
+            if held_keys[CONTROLS["crouch"]] and CONTROLS["hold_crouch_and_sprint"] is True:
+                self.toggle_crouch_stance(True)
+            elif CONTROLS["hold_crouch_and_sprint"] is True:
+                self.toggle_crouch_stance(False)
+
+            # Running
+            if held_keys[CONTROLS["run"]] and CONTROLS["hold_crouch_and_sprint"] is True \
+                    and self.speed != self.crouched_speed:
+                self.speed = self.sprinting_speed
+            elif CONTROLS["hold_crouch_and_sprint"] is True and not held_keys[CONTROLS["crouch"]]:
+                self.speed = self.walking_speed
 
             self.footstep_cooldown -= time.dt
             if (held_keys[CONTROLS["forward"]] or held_keys[CONTROLS["backward"]] or held_keys[CONTROLS["right"]]\
@@ -183,29 +181,32 @@ class FirstPersonController(Entity):
                 self.y -= min(self.air_time, ray.distance-.05) * time.dt * 100
                 self.air_time += time.dt * .25 * self.gravity
 
+    def toggle_crouch_stance(self, is_crouched:bool=False):
+        if is_crouched is True:
+            self.speed = self.crouched_speed
+            self.camera_pivot.y = 1
+            self.character_model.y = -4.2
+        else:
+            self.speed = self.walking_speed
+            self.camera_pivot.y = 2
+            self.character_model.y = -3.2
+
     def input(self, key):
         if key == CONTROLS["jump"]:
             self.jump()
 
-        if key == CONTROLS["run"] and CONTROLS["hold_sprint"] is False:
+        if key == CONTROLS["run"] and CONTROLS["hold_crouch_and_sprint"] is False:
             self.is_sprinting = not self.is_sprinting
             self.speed = self.sprinting_speed if self.is_sprinting is True else self.walking_speed
             if self.is_crouched is True:
-                self.camera_pivot.y = 2
-                self.character_model.y = -3.2
                 self.is_crouched = False
+                self.toggle_crouch_stance(self.is_crouched)
 
-        if key == CONTROLS["crouch"] and CONTROLS["hold_crouch"] is False:
+        if key == CONTROLS["crouch"] and CONTROLS["hold_crouch_and_sprint"] is False:
             self.is_crouched = not self.is_crouched
             if self.is_crouched is True:
                 self.is_sprinting = False
-                self.speed = self.crouched_speed
-                self.camera_pivot.y = 1
-                self.character_model.y = -4.2
-            else:
-                self.speed = self.walking_speed
-                self.camera_pivot.y = 2
-                self.character_model.y = -3.2
+            self.toggle_crouch_stance(self.is_crouched)
 
     def jump(self):
         if self.grounded is False:
