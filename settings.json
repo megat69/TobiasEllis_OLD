@@ -1,5 +1,5 @@
 {
-  "fullscreen": false,
+  "fullscreen": true,
   "framerate_cap": null,
   "rich_presence_enabled": true,
   "sensitivity": 100,
@@ -40,12 +40,12 @@
   "customization": {
     "FPS_counter_visible": true,
     "crosshair_enabled": true,
-    "crosshair_RGBA": [0, 255, 0, 255]
+    "crosshair_RGBA": [0, 200, 0, 200]
   },
   "graphics": {
     "FOV": 90,
     "FXAA_antialiasing": true,
     "SSAO": false,
-    "vsync": false
+    "vsync": true
   }
 }

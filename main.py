@@ -290,19 +290,25 @@ if save_info["current_chapter"] == "01":
                     player.title_message.origin = (0,0)
             # Ends the chapter 01
             if distance(self, player) < 1.85 and is_door_opened is True and self.keep_looping is True:
-                self.keep_looping = False
-                player.movement_allowed = False
-                intro_music.play()
+                self.keep_looping = False  # We no longer need to loop the update function
+                player.movement_allowed = False  # Player is forbidden to move
+                background_music.fade_out()  # Stops the background music
+                intro_music.play()  # Starts the intro music
+                # Makes the inventory disappear
                 player.inventory_display[0].animate_color(color.rgb(0, 0, 0, 0), duration=1)
                 player.inventory.clear()
+                # Makes the crosshair disappear
                 if CUSTOMIZATION_SETTINGS["crosshair_enabled"] is True:
                     player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=1)
 
+                # Adds the title animation
                 title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
                 author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
                                      visible=False, scale=(0.75, 0.25), y=-0.3)
+                """# Rotates the player completely if its rotation is not enough
                 player.animate_rotation((0, 0, 0), duration=1)
-                player.camera_pivot.animate_rotation((0, 0, 0), duration=1)
+                player.camera_pivot.animate_rotation((0, 0, 0), duration=1)"""
+                # Animates the player visibility
                 invoke(setattr, title, "visible", True, delay=7)
                 invoke(setattr, author_name, "visible", True, delay=9.6)
                 invoke(setattr, author_name, "visible", False, delay=14.6)
@@ -418,6 +424,9 @@ if __name__ == "__main__":
     generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player)
 
     if save_info["current_chapter"] == "01":
+        background_music = Audio("assets/music/piano_tension.mp3", autoplay=False, loop=True, volume=0.25)
+        invoke(background_music.play, delay=0)
+
         player.camera_pivot.rotation_x = 73.8
         player.rotation_y = -6.77
         player.toggle_crouch_stance(True)
