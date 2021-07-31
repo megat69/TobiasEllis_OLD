@@ -1,3 +1,6 @@
 {
-  "current_chapter": "01"
+  "current_chapter": "01",
+  "chapter_name": {
+    "01": "Awakening"
+  }
 }

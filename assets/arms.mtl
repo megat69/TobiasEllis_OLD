@@ -1,0 +1,16 @@
+# Blender MTL File: 'Character.blend'
+# Material Count: 1
+
+newmtl Ch01_body
+Ns 179.999996
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_547b9b58-27b3-468e-b982-c2c8760dd375.fbm\\Ch01_1001_Normal.png
+map_Kd C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_547b9b58-27b3-468e-b982-c2c8760dd375.fbm\\Ch01_1001_Diffuse.png
+map_Ks C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_547b9b58-27b3-468e-b982-c2c8760dd375.fbm\\Ch01_1001_Specular.png
+map_d C:\\Users\\mathi\\Dev\\home\\app\\mixamo-mini\\tmp\\skins_547b9b58-27b3-468e-b982-c2c8760dd375.fbm\\Ch01_1001_Diffuse.png

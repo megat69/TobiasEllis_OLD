@@ -2,13 +2,16 @@
 Game by megat69.
 """
 from ursina import *
-from ursina.shaders import lit_with_shadows_shader, ssao_shader, fxaa_shader
+from ursina.shaders import lit_with_shadows_shader, fxaa_shader, ssao_shader
 import json
 from pypresence import Presence
 from map_generator import generate_map
 from random import randint
 
 ################################################### INIT ###############################################################
+
+DEBUG_MODE = True
+DRUG_MODE = False
 
 # Loads the settings
 with open("settings.json", "r", encoding="utf-8") as f:
@@ -36,7 +39,15 @@ else:
     window.fps_counter.visible = False
 window.exit_button.disabled = True
 application.development_mode = True
-camera.shader = fxaa_shader if GRAPHICS["FXAA_antialiasing"] is True else None
+if GRAPHICS["FXAA_antialiasing"] is True and GRAPHICS["SSAO"] is False:
+    camera.shader = fxaa_shader
+elif GRAPHICS["FXAA_antialiasing"] is False and GRAPHICS["SSAO"] is True:
+    camera.shader = ssao_shader
+elif GRAPHICS["FXAA_antialiasing"] is True and GRAPHICS["SSAO"] is True:
+    print("\n"*4+"You cannot use both FXAA and SSAO at once. Please disable one of them.")
+    sys.exit(1)
+else:
+    camera.shader = None
 
 # Caps the framerate if wanted
 if settings["framerate_cap"] is not None:
@@ -81,8 +92,11 @@ class FirstPersonController(Entity):
         self.is_sprinting = False
 
         # Character model
-        self.arms = Entity(parent=self, model="assets/Character.obj", position=(0, -3.2, -0.1),
-                           texture="assets/Character_texture.png", shader=lit_with_shadows_shader)
+        #self.arms = Entity(parent=self, position=(0, -3.2, -0.1), visible=False)
+        self.left_arm = Entity(parent=self, model="assets/left_arm.obj",
+                               texture="assets/arms_texture.png", shader=lit_with_shadows_shader)
+        self.right_arm = duplicate(self.left_arm, model="assets/right_arm.obj", shader=lit_with_shadows_shader)
+        self.arms = (self.left_arm, self.right_arm)
 
         self.gravity = 0
         invoke(setattr, self, "gravity", 1, delay=1.4)
@@ -196,11 +210,13 @@ class FirstPersonController(Entity):
         if is_crouched is True:
             self.speed = self.crouched_speed
             self.camera_pivot.y = 1
-            self.arms.y = -4.2
+            for arm in self.arms:
+                arm.y = -4.2
         else:
             self.speed = self.walking_speed
             self.camera_pivot.y = 2
-            self.arms.y = -3.2
+            for arm in self.arms:
+                arm.y = -3.2
 
     def input(self, key):
         if key == CONTROLS["jump"]:
@@ -248,7 +264,6 @@ class FirstPersonController(Entity):
         if CUSTOMIZATION_SETTINGS["crosshair_enabled"]:
             self.cursor.enabled = False
 
-# TODO : variable "being aimed at" for all buttons
 if save_info["current_chapter"] == "01":
     class DoorCollider(Button):
         def __init__(self):
@@ -257,8 +272,17 @@ if save_info["current_chapter"] == "01":
             self.audio_cant_open_door = Audio("assets/Chapter01/door/cant_open_door.mp3", autoplay=False, loop=False)
             self.audio_door_opening = Audio("assets/Chapter01/door/door_opening.mp3", autoplay=False, loop=False)
             self.keep_looping = True
+            self.being_aimed_at = False
 
         def update(self):
+            # On player looking
+            if self.being_aimed_at is True:
+                if distance(self, player) < 4 and is_door_opened is False:
+                    if not "key" in player.inventory:
+                        player.title_message.text = "This door is locked."
+                    else:
+                        player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) Open the door")
+                    player.title_message.origin = (0,0)
             # Ends the chapter 01
             if distance(self, player) < 1.85 and is_door_opened is True and self.keep_looping is True:
                 self.keep_looping = False
@@ -266,20 +290,19 @@ if save_info["current_chapter"] == "01":
                 intro_music.play()
                 player.inventory_display[0].animate_color(color.rgb(0, 0, 0, 0), duration=1)
                 player.inventory.clear()
+                if CUSTOMIZATION_SETTINGS["crosshair_enabled"] is True:
+                    player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=1)
 
                 title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
                 author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
                                      visible=False, scale=(0.75, 0.25), y=-0.3)
-                hider = Entity(parent=camera.ui, model="quad", color=color.black,
-                                     visible=False, scale=6)
+                player.animate_rotation((0, 0, 0), duration=1)
+                player.camera_pivot.animate_rotation((0, 0, 0), duration=1)
                 invoke(setattr, title, "visible", True, delay=7)
                 invoke(setattr, author_name, "visible", True, delay=9.6)
                 invoke(setattr, author_name, "visible", False, delay=14.6)
                 invoke(setattr, title, "visible", False, delay=16.9)
-                invoke(setattr, hider, "visible", True, delay=19.3)
-                invoke(intro_music.stop, delay=23.5)
-                # TODO fade out : intro_music.fade_out(duration=0.7, delay=23.5)
-                # TODO : Make the player rotate towards the door completely
+                invoke(intro_music.fade_out, duration=3, delay=21)
 
         def input(self, key):
             if self.hovered:
@@ -300,28 +323,10 @@ if save_info["current_chapter"] == "01":
                         is_door_opened = True
 
         def on_mouse_enter(self):
-            if distance(self, player) < 4 and is_door_opened is False:
-                if not "key" in player.inventory:
-                    player.title_message.text = "This door is locked."
-                else:
-                    player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) Open the door")
-                player.title_message.x = -0.12
+            self.being_aimed_at = True
 
         def on_mouse_exit(self):
-            player.title_message.text = ""
-            player.title_message.x = 0
-
-    class Paper(Button):
-        def __init__(self):
-            super().__init__(parent=scene, model="plane", scale=0.2,
-                             position=(0, -2.98, 0), color=color.white)
-
-        def on_mouse_enter(self):
-            if distance(self, player) < 2:
-                player.title_message.text = "The key is on the chandelier."
-                player.title_message.x = -0.18
-
-        def on_mouse_exit(self):
+            self.being_aimed_at = False
             player.title_message.text = ""
             player.title_message.x = 0
 
@@ -331,11 +336,18 @@ if save_info["current_chapter"] == "01":
                              texture="assets/Chapter01/key/key_texture.jpg",
                              position=(0, 1.1, 0), rotation=(90, 90, 0), scale=0.8)
             self.audio_keys = Audio("assets/Chapter01/door/keys.mp3", autoplay=False, loop=False)
+            self.being_aimed_at = False
+            self.aim_distance = 4
+
+        def update(self):
+            if self.being_aimed_at is True and distance(self, player) < self.aim_distance:
+                player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) Pickup the key")
+                player.title_message.origin = (0,0)
 
         def input(self, key):
             if self.hovered:
                 # If we try to open the door
-                if key == CONTROLS["interact"] and distance(self, player) < 5:
+                if key == CONTROLS["interact"] and distance(self, player) < self.aim_distance:
                     # Picking up key
                     self.audio_keys.play()
                     player.add_to_inventory("key")
@@ -343,11 +355,10 @@ if save_info["current_chapter"] == "01":
                     destroy(self)
 
         def on_mouse_enter(self):
-            if distance(self, player) < 5:
-                player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) Pickup the key")
-                player.title_message.x = -0.18
+            self.being_aimed_at = True
 
         def on_mouse_exit(self):
+            self.being_aimed_at = False
             player.title_message.text = ""
             player.title_message.x = 0
 
@@ -372,6 +383,29 @@ if __name__ == "__main__":
                 RICH_PRESENCE_ENABLED = False
                 print("Rich Presence has been disabled, since the following error occurred :", e)
 
+        if DRUG_MODE is True:
+            awful_quad.color = color.rgb(randint(0, 255), randint(0, 255), randint(0, 255), 100)
+
+        if DEBUG_MODE is True:
+            if debug_enabled:
+                coords.text = f"Coords : ({player.x:.2f}, {player.y:.2f}, {player.z:.2f})"
+                rotation.text = f"Rot. : ({player.camera_pivot.rotation_x:.2f}, {player.rotation_y:.2f}, {player.camera_pivot.rotation_z:.2f})"
+
+    if DEBUG_MODE:
+        coords = Text("Coords : ", position=(-0.5, 0.45), visible=False)
+        rotation = Text("Rot. : ", position=(-0.5, 0.41), visible=False)
+        debug_enabled = False
+
+    def input(key):
+        if key == "f3" and DEBUG_MODE is True:
+            global debug_enabled
+            debug_enabled = not debug_enabled
+            coords.visible = debug_enabled
+            rotation.visible = debug_enabled
+
+    if DRUG_MODE is True:
+        awful_quad = Entity(parent=camera.ui, model="quad", color=color.white, scale=2)
+
     # Creates the player
     player = FirstPersonController()
     #EditorCamera()
@@ -387,12 +421,31 @@ if __name__ == "__main__":
                       position=(0, -3, 7.5), shader=lit_with_shadows_shader, scale=0.6, origin_x=0)
         door_collider = DoorCollider()
 
-        paper = Paper()
         key = Key()
+
+    # Printing out the chapter name
+    chapter_title = Text(f"Chapter {save_info['current_chapter']}", font="assets/font/coolvetica/coolvetica rg.ttf",
+                         origin=(0,0), color=color.rgba(255, 255, 255, 0), scale=3, position=(0, 0.1))
+    chapter_name = Text(save_info["chapter_name"][save_info['current_chapter']],
+                        font="assets/font/coolvetica/coolvetica rg.ttf",
+                         origin=(0,0), color=color.rgba(255, 255, 255, 0), scale=2.8, position=(0, -0.1))
+    chapter_separator = Entity(parent=camera.ui, model="quad", color=color.rgba(255, 255, 255, 0), scale=(0.1, 0.004))
+
+    if CUSTOMIZATION_SETTINGS["crosshair_enabled"] is True:
+        player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=0.2)
+        invoke(player.cursor.animate_color, color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"]), duration=0.5, delay=7)
+
+    for i in ((255, 0, 0), (0, 4, 3)):
+        chapter_title.animate_color(color.rgba(255, 255, 255, i[0]), duration=3, delay=0+i[1])
+        chapter_name.animate_color(color.rgba(255, 255, 255, i[0]), duration=3, delay=1+i[2])
+        chapter_separator.animate_color(color.rgba(255, 255, 255, i[0]), duration=1, delay=2+i[1])
+        chapter_separator.animate_scale((0.6, 0.008, 1), duration=3, delay=2+i[1], curve=curve.linear)
+
+    for entity in (chapter_separator, chapter_title, chapter_name):
+        destroy(entity, delay=10)
 
 
     # TODO : Dynamic LODs for wall textures
-    # TODO : Gamepad support
 
     # Runs the app
     app.run()

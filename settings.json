@@ -1,10 +1,10 @@
 {
-  "fullscreen": true,
+  "fullscreen": false,
   "framerate_cap": null,
   "rich_presence_enabled": true,
   "sensitivity": 100,
   "controls": {
-    "use_controller": true,
+    "use_controller": false,
     "mouse_and_keyboard": {
       "sensitivity": 100,
       "forward": "z",
@@ -38,12 +38,13 @@
   },
   "customization": {
     "FPS_counter_visible": true,
-    "crosshair_enabled": false,
+    "crosshair_enabled": true,
     "crosshair_RGBA": [0, 255, 0, 255]
   },
   "graphics": {
     "FOV": 90,
-    "FXAA_antialiasing": false,
+    "FXAA_antialiasing": true,
+    "SSAO": false,
     "vsync": false
   }
 }
