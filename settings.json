@@ -1,19 +1,40 @@
 {
   "fullscreen": true,
-  "vsync": false,
   "framerate_cap": null,
   "rich_presence_enabled": true,
   "sensitivity": 100,
   "controls": {
-    "forward": "z",
-    "backward": "s",
-    "left": "q",
-    "right": "d",
-    "jump": "space",
-    "run": "shift",
-    "crouch": "control",
-    "interact": "e",
-    "hold_crouch_and_sprint": true
+    "use_controller": true,
+    "mouse_and_keyboard": {
+      "sensitivity": 100,
+      "forward": "z",
+      "backward": "s",
+      "left": "q",
+      "right": "d",
+      "jump": "space",
+      "run": "shift",
+      "crouch": "control",
+      "interact": "e",
+      "secondary_interaction": "f",
+      "tertiary_interaction": "a",
+      "hold_crouch_and_sprint": true
+    },
+    "controller": {
+      "sensitivity": [90, 100],
+      "forward": "gamepad left stick y",
+      "backward": 0,
+      "left": 0,
+      "right": "gamepad left stick x",
+      "jump": "gamepad a",
+      "run": "gamepad right stick",
+      "crouch": "gamepad x",
+      "interact": "gamepad b",
+      "secondary_interaction": "gamepad left shoulder",
+      "tertiary_interaction": "gamepad right shoulder",
+      "hold_crouch_and_sprint": false,
+      "invert_x_axis": false,
+      "invert_y_axis": false
+    }
   },
   "customization": {
     "FPS_counter_visible": true,
@@ -21,6 +42,8 @@
     "crosshair_RGBA": [0, 255, 0, 255]
   },
   "graphics": {
-    "FOV": 90
+    "FOV": 90,
+    "FXAA_antialiasing": false,
+    "vsync": false
   }
 }

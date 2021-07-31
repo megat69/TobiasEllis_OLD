@@ -2,7 +2,7 @@
 Game by megat69.
 """
 from ursina import *
-from ursina.shaders import lit_with_shadows_shader
+from ursina.shaders import lit_with_shadows_shader, ssao_shader, fxaa_shader
 import json
 from pypresence import Presence
 from map_generator import generate_map
@@ -15,7 +15,10 @@ with open("settings.json", "r", encoding="utf-8") as f:
     settings = json.load(f)
     RICH_PRESENCE_ENABLED = settings["rich_presence_enabled"]
     CUSTOMIZATION_SETTINGS = settings["customization"]
+    # Getting controls settings and choosing the correct one
     CONTROLS = settings["controls"]
+    USING_CONTROLLER = CONTROLS["use_controller"]
+    CONTROLS = CONTROLS["mouse_and_keyboard"] if USING_CONTROLLER is False else CONTROLS["controller"]
     GRAPHICS = settings["graphics"]
 
 # Loads the save info
@@ -23,7 +26,7 @@ with open("save.json", "r", encoding="utf-8") as f:
     save_info = json.load(f)
 
 # Creates the Ursina app
-app = Ursina(fullscreen=settings["fullscreen"], vsync=settings["vsync"])
+app = Ursina(fullscreen=settings["fullscreen"], vsync=GRAPHICS["vsync"])
 # Tweaks some settings
 window.exit_button.visible = False
 if CUSTOMIZATION_SETTINGS["FPS_counter_visible"] is True:
@@ -32,7 +35,8 @@ if CUSTOMIZATION_SETTINGS["FPS_counter_visible"] is True:
 else:
     window.fps_counter.visible = False
 window.exit_button.disabled = True
-#TODO: application.development_mode = False
+application.development_mode = True
+camera.shader = fxaa_shader if GRAPHICS["FXAA_antialiasing"] is True else None
 
 # Caps the framerate if wanted
 if settings["framerate_cap"] is not None:
@@ -71,13 +75,14 @@ class FirstPersonController(Entity):
         camera.rotation = (0,0,0)
         camera.fov = GRAPHICS["FOV"]
         mouse.locked = True
-        self.mouse_sensitivity = Vec2(settings["sensitivity"], settings["sensitivity"])
+        if USING_CONTROLLER is False:
+            self.mouse_sensitivity = Vec2(CONTROLS["sensitivity"], CONTROLS["sensitivity"])
         self.is_crouched = False
         self.is_sprinting = False
 
         # Character model
-        self.character_model = Entity(parent=self, model="assets/Character.obj", position=(0, -3.2, -0.1),
-                                      texture="assets/Character_texture.png", shader=lit_with_shadows_shader)
+        self.arms = Entity(parent=self, model="assets/Character.obj", position=(0, -3.2, -0.1),
+                           texture="assets/Character_texture.png", shader=lit_with_shadows_shader)
 
         self.gravity = 0
         invoke(setattr, self, "gravity", 1, delay=1.4)
@@ -138,9 +143,15 @@ class FirstPersonController(Entity):
                 if self.footstep_cooldown < 0.5:
                     self.footstep_cooldown = 0.5
 
-            self.rotation_y += mouse.velocity[0] * self.mouse_sensitivity[1]
+            if USING_CONTROLLER is False:
+                self.rotation_y += mouse.velocity[0] * self.mouse_sensitivity[1]
+                self.camera_pivot.rotation_x -= mouse.velocity[1] * self.mouse_sensitivity[0]
+            else:
+                self.rotation_y -= held_keys["gamepad right stick x"] * time.dt * CONTROLS["sensitivity"][1] \
+                                   * (-1 if CONTROLS["invert_y_axis"] is False else 1)
+                self.camera_pivot.rotation_x += held_keys["gamepad right stick y"] * time.dt * CONTROLS["sensitivity"][0] \
+                                                * (-1 if CONTROLS["invert_x_axis"] is False else 1)
 
-            self.camera_pivot.rotation_x -= mouse.velocity[1] * self.mouse_sensitivity[0]
             self.camera_pivot.rotation_x = clamp(self.camera_pivot.rotation_x, -90, 90)
 
             self.direction = Vec3(
@@ -148,13 +159,13 @@ class FirstPersonController(Entity):
                 + self.right * (held_keys[CONTROLS["right"]] - held_keys[CONTROLS["left"]])
                 ).normalized()
 
-            """feet_ray = raycast(self.position+Vec3(0,0.5,0), self.direction, ignore=(self, self.character_model), distance=.5, debug=False)
-            head_ray = raycast(self.position+Vec3(0,self.height-.1,0), self.direction, ignore=(self, self.character_model), distance=.5, debug=False)
-            mid_ray = raycast(self.position+Vec3(0,self.height//2,0), self.direction, ignore=(self, self.character_model), distance=.5, debug=False)
+            """feet_ray = raycast(self.position+Vec3(0,0.5,0), self.direction, ignore=(self, self.arms), distance=.5, debug=False)
+            head_ray = raycast(self.position+Vec3(0,self.height-.1,0), self.direction, ignore=(self, self.arms), distance=.5, debug=False)
+            mid_ray = raycast(self.position+Vec3(0,self.height//2,0), self.direction, ignore=(self, self.arms), distance=.5, debug=False)
             if not feet_ray.hit and not head_ray.hit and not mid_ray.hit:
                 self.position += self.direction * self.speed * time.dt"""
-            ray = boxcast(self.position+Vec3(0,self.height//2,0), self.direction, thickness=(0.5, self.height-0.5),
-                          ignore=(self, self.character_model), distance=0.25, debug=False)
+            ray = boxcast(self.position + Vec3(0,self.height//2,0), self.direction, thickness=(0.5, self.height-0.5),
+                          ignore=(self, self.arms), distance=0.25, debug=False)
             if not ray.hit:
                 self.position += self.direction * self.speed * time.dt
             else:
@@ -185,11 +196,11 @@ class FirstPersonController(Entity):
         if is_crouched is True:
             self.speed = self.crouched_speed
             self.camera_pivot.y = 1
-            self.character_model.y = -4.2
+            self.arms.y = -4.2
         else:
             self.speed = self.walking_speed
             self.camera_pivot.y = 2
-            self.character_model.y = -3.2
+            self.arms.y = -3.2
 
     def input(self, key):
         if key == CONTROLS["jump"]:
@@ -237,6 +248,7 @@ class FirstPersonController(Entity):
         if CUSTOMIZATION_SETTINGS["crosshair_enabled"]:
             self.cursor.enabled = False
 
+# TODO : variable "being aimed at" for all buttons
 if save_info["current_chapter"] == "01":
     class DoorCollider(Button):
         def __init__(self):
@@ -267,6 +279,7 @@ if save_info["current_chapter"] == "01":
                 invoke(setattr, hider, "visible", True, delay=19.3)
                 invoke(intro_music.stop, delay=23.5)
                 # TODO fade out : intro_music.fade_out(duration=0.7, delay=23.5)
+                # TODO : Make the player rotate towards the door completely
 
         def input(self, key):
             if self.hovered:
