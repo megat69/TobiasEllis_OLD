@@ -3,6 +3,7 @@ Game by megat69.
 """
 from ursina import *
 from ursina.shaders import lit_with_shadows_shader, fxaa_shader, ssao_shader
+from ursina import curve
 import json
 from pypresence import Presence
 from map_generator import generate_map
@@ -309,7 +310,6 @@ if save_info["current_chapter"] == "01":
                 global is_door_opened
                 # If we try to open the door
                 if key == CONTROLS["interact"] and distance(self, player) < 4 and is_door_opened is False:
-                    print("Trying to open the door.")
                     # If the player has no key : can't open door
                     if not "key" in player.inventory:
                         self.audio_cant_open_door.play()
@@ -414,6 +414,11 @@ if __name__ == "__main__":
     generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player)
 
     if save_info["current_chapter"] == "01":
+        player.camera_pivot.rotation_x = 73.8
+        player.rotation_y = -6.77
+        player.toggle_crouch_stance(True)
+        player.movement_allowed = False
+
         is_door_opened = False
 
         # Door
@@ -422,6 +427,37 @@ if __name__ == "__main__":
         door_collider = DoorCollider()
 
         key = Key()
+
+        # Cutscene
+        def cutscene():
+            # Removing crosshair
+            if CUSTOMIZATION_SETTINGS["crosshair_enabled"] is True:
+                player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=0.2)
+                invoke(player.cursor.animate_color, color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"]), duration=0.5,
+                       delay=8)
+
+            # First camera rotation (waking up)
+            invoke(player.camera_pivot.animate_rotation, (54.3, 0, 0), duration=3, curve=curve.linear)
+            invoke(setattr, player.title_message, "text", "Ughh...")
+            invoke(setattr, player.title_message, "origin", (0, 0))
+            # Turning the head towards the corpse
+            invoke(player.camera_pivot.animate_rotation, (19, 103, 0), delay=3, duration=1.4, curve=curve.in_back)
+            invoke(setattr, player.title_message, "text", "What happened here ?", delay=3.5)
+            invoke(setattr, player.title_message, "origin", (0, 0), delay=3.5)
+            # Beginning to get up
+            invoke(player.camera_pivot.animate_rotation, (48, 0, 0), delay=5.5, duration=1, curve=curve.linear)
+            invoke(player.animate_rotation, (0, 88, 0), delay=5.5, duration=1, curve=curve.linear)
+            invoke(setattr, player.title_message, "text", "", delay=5.5)
+            # Getting up
+            invoke(player.camera_pivot.animate_rotation, (0, 0, 0), delay=6.5, duration=1, curve=curve.linear)
+            invoke(player.animate_rotation, (0, 80, 0), delay=6.5, duration=1, curve=curve.linear)
+            invoke(player.toggle_crouch_stance, False, delay=7)
+            # invoke(player.animate_position, (-3.77585, -2, -3.4301), delay=5.5, duration=1, curve=curve.linear)
+            # Player can move
+            invoke(setattr, player, "movement_allowed", True, delay=7.5)
+
+        # Invoking cutscene after the chapter name announcement is finished
+        invoke(cutscene, delay=7.1)
 
     # Printing out the chapter name
     chapter_title = Text(f"Chapter {save_info['current_chapter']}", font="assets/font/coolvetica/coolvetica rg.ttf",
