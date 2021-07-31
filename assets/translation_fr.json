@@ -1,0 +1,23 @@
+{
+  "overall": {
+    "double_shaders_error": "Vous ne pouvez pas utiliser et FXAA et SSAO en même temps. Veuillez en désactiver un.",
+    "RPC_disabled": "Rich Presence a été désactivé, parce que l'erreur suivante est survenue :",
+    "chapter": "Chapitre"
+  },
+  "Chapter01": {
+    "chapter_name": "Réveil",
+    "broken_wine_bottle": "Qui a cassé cette bouteille ?",
+    "knocked_out_man": "Qui a pu assomer cet homme ?",
+    "knife": "Je ne devrais pas le prendre.",
+    "paper": "\"La clé est sur le chandelier.\"",
+    "door": {
+      "locked": "Cette porte est fermée à clé.",
+      "unlocked": "Ouvrir la porte"
+    },
+    "key": "Prendre la clé",
+    "cutscene_dialogs": [
+      "Ughh...",
+      "Qu'est-ce qui s'est passé ?"
+    ]
+  }
+}

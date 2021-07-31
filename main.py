@@ -25,6 +25,10 @@ with open("settings.json", "r", encoding="utf-8") as f:
     CONTROLS = CONTROLS["mouse_and_keyboard"] if USING_CONTROLLER is False else CONTROLS["controller"]
     GRAPHICS = settings["graphics"]
 
+# Loads the translation
+with open(f"assets/translation_{settings['language']}.json", "r", encoding="utf-8") as f:
+    TRANSLATION = json.load(f)
+
 # Loads the save info
 with open("save.json", "r", encoding="utf-8") as f:
     save_info = json.load(f)
@@ -45,7 +49,7 @@ if GRAPHICS["FXAA_antialiasing"] is True and GRAPHICS["SSAO"] is False:
 elif GRAPHICS["FXAA_antialiasing"] is False and GRAPHICS["SSAO"] is True:
     camera.shader = ssao_shader
 elif GRAPHICS["FXAA_antialiasing"] is True and GRAPHICS["SSAO"] is True:
-    print("\n"*4+"You cannot use both FXAA and SSAO at once. Please disable one of them.")
+    print("\n"*4+TRANSLATION["overall"]["double_shaders_error"])
     sys.exit(1)
 else:
     camera.shader = None
@@ -64,7 +68,7 @@ if RICH_PRESENCE_ENABLED is True:
         RPC_update_cooldown = 0
     except Exception as e:
         RICH_PRESENCE_ENABLED = False
-        print("Rich Presence has been disabled, since the following error occurred :", e)
+        print(TRANSLATION["overall"]["RPC_disabled"], e)
 
 # Prepares intro music
 if save_info["current_chapter"] == "01":
@@ -280,9 +284,9 @@ if save_info["current_chapter"] == "01":
             if self.being_aimed_at is True:
                 if distance(self, player) < 4 and is_door_opened is False:
                     if not "key" in player.inventory:
-                        player.title_message.text = "This door is locked."
+                        player.title_message.text = TRANSLATION["Chapter01"]["door"]["unlocked"]
                     else:
-                        player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) Open the door")
+                        player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) " + TRANSLATION["Chapter01"]["door"]["unlocked"])
                     player.title_message.origin = (0,0)
             # Ends the chapter 01
             if distance(self, player) < 1.85 and is_door_opened is True and self.keep_looping is True:
@@ -341,7 +345,7 @@ if save_info["current_chapter"] == "01":
 
         def update(self):
             if self.being_aimed_at is True and distance(self, player) < self.aim_distance:
-                player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) Pickup the key")
+                player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) " + TRANSLATION["Chapter01"]["key"])
                 player.title_message.origin = (0,0)
 
         def input(self, key):
@@ -438,11 +442,11 @@ if __name__ == "__main__":
 
             # First camera rotation (waking up)
             invoke(player.camera_pivot.animate_rotation, (54.3, 0, 0), duration=3, curve=curve.linear)
-            invoke(setattr, player.title_message, "text", "Ughh...")
+            invoke(setattr, player.title_message, "text", TRANSLATION["Chapter01"]["cutscene_dialogs"][0])
             invoke(setattr, player.title_message, "origin", (0, 0))
             # Turning the head towards the corpse
             invoke(player.camera_pivot.animate_rotation, (19, 103, 0), delay=3, duration=1.4, curve=curve.in_back)
-            invoke(setattr, player.title_message, "text", "What happened here ?", delay=3.5)
+            invoke(setattr, player.title_message, "text", TRANSLATION["Chapter01"]["cutscene_dialogs"][1], delay=3.5)
             invoke(setattr, player.title_message, "origin", (0, 0), delay=3.5)
             # Beginning to get up
             invoke(player.camera_pivot.animate_rotation, (48, 0, 0), delay=5.5, duration=1, curve=curve.linear)
@@ -460,9 +464,10 @@ if __name__ == "__main__":
         invoke(cutscene, delay=7.1)
 
     # Printing out the chapter name
-    chapter_title = Text(f"Chapter {save_info['current_chapter']}", font="assets/font/coolvetica/coolvetica rg.ttf",
+    chapter_title = Text(TRANSLATION["overall"]["chapter"] + " " + save_info['current_chapter'],
+                         font="assets/font/coolvetica/coolvetica rg.ttf",
                          origin=(0,0), color=color.rgba(255, 255, 255, 0), scale=3, position=(0, 0.1))
-    chapter_name = Text(save_info["chapter_name"][save_info['current_chapter']],
+    chapter_name = Text(TRANSLATION["Chapter" + save_info["current_chapter"]]["chapter_name"],
                         font="assets/font/coolvetica/coolvetica rg.ttf",
                          origin=(0,0), color=color.rgba(255, 255, 255, 0), scale=2.8, position=(0, -0.1))
     chapter_separator = Entity(parent=camera.ui, model="quad", color=color.rgba(255, 255, 255, 0), scale=(0.1, 0.004))

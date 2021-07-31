@@ -1,0 +1,23 @@
+{
+  "overall": {
+    "double_shaders_error": "You cannot use both FXAA and SSAO at once. Please disable one of them.",
+    "RPC_disabled": "Rich Presence has been disabled, since the following error occurred :",
+    "chapter": "Chapter"
+  },
+  "Chapter01": {
+    "chapter_name": "Awakening",
+    "broken_wine_bottle": "Who broke this bottle ?",
+    "knocked_out_man": "Who knocked him out ?",
+    "knife": "Nah, I shouldn't take that.",
+    "paper": "\"The key is on the chandelier.\"",
+    "door": {
+      "locked": "This door is locked.",
+      "unlocked": "Open the door"
+    },
+    "key": "Pickup the key",
+    "cutscene_dialogs": [
+      "Ughh...",
+      "What happened here ?"
+    ]
+  }
+}

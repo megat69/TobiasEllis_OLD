@@ -67,7 +67,7 @@
         "shader": true,
         "collider": "plane"
       },
-      "object_lore": "Who broke this bottle ?",
+      "object_lore": "TRANSLATION->broken_wine_bottle",
       "distance_to_entity": 2
     },
     "left_wall": {
@@ -142,7 +142,7 @@
         "collider": "mesh",
         "color": "white"
       },
-      "object_lore": "Who knocked him out ?",
+      "object_lore": "TRANSLATION->knocked_out_man",
       "distance_to_entity": 3
     },
     "knife": {
@@ -156,7 +156,7 @@
         "scale": 0.15,
         "color": "white"
       },
-      "object_lore": "Nah, I shouldn't take that.",
+      "object_lore": "TRANSLATION->knife",
       "distance_to_entity": 3.5
     },
     "door_frame": {
@@ -247,7 +247,7 @@
   },
   "paper": {
     "type": "LoredObject",
-    "object_lore": "The key is on the chandelier.",
+    "object_lore": "TRANSLATION->paper",
     "distance_to_entity": 2,
     "data": {
       "model": "plane",

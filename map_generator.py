@@ -13,9 +13,27 @@ with open("settings.json", "r", encoding="utf-8") as f:
     CONTROLS = CONTROLS["mouse_and_keyboard"] if USING_CONTROLLER is False else CONTROLS["controller"]
     GRAPHICS = settings["graphics"]
 
+# Loads the translation
+with open(f"assets/translation_{settings['language']}.json", "r", encoding="utf-8") as f:
+    TRANSLATION = json.load(f)
+
+# Loads the save info
+with open("save.json", "r", encoding="utf-8") as f:
+    save_info = json.load(f)
+
 class LoredObject(Button):
     def __init__(self, player, object_lore:str="", distance_to_entity:(int, float)=5, **kwargs):
         super().__init__(**kwargs)
+        # Loading object translation if necessary
+        if object_lore.startswith("TRANSLATION->"):
+            object_lore = object_lore.replace("TRANSLATION->", "", 1)
+            try:
+                object_lore = TRANSLATION["Chapter" + save_info["current_chapter"]][object_lore]
+            except Exception as e:
+                print("\n"*4 + f"Missing translation for {object_lore} (Chapter "
+                               f"{save_info['current_chapter']}) in lang {settings['language']}.")
+                raise e
+
         self.object_lore = dedent(object_lore)
         self.distance_to_entity = distance_to_entity
         self.being_aimed_at = False
