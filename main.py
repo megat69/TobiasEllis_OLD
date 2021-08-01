@@ -12,7 +12,7 @@ from random import randint
 
 ################################################### INIT ###############################################################
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 DRUG_MODE = False
 
 # Loads the settings
@@ -57,7 +57,7 @@ else:
 
 # Caps the framerate if wanted
 if settings["framerate_cap"] is not None:
-    from panda3d.core import ClockObject
+    from panda3d.core import ClockObject, globalClock
     globalClock.setMode(ClockObject.MLimited)
     globalClock.setFrameRate(settings["framerate_cap"])
 
@@ -74,6 +74,7 @@ if RICH_PRESENCE_ENABLED is True:
 # Prepares intro music
 if save_info["current_chapter"] == "01":
     intro_music = Audio("assets/music/intro_music.mp3", autoplay=False)
+
 
 #################################################### MAIN ##############################################################
 class FirstPersonController(Entity):
@@ -98,7 +99,7 @@ class FirstPersonController(Entity):
         self.is_sprinting = False
 
         # Character model
-        #self.arms = Entity(parent=self, position=(0, -3.2, -0.1), visible=False)
+        # self.arms = Entity(parent=self, position=(0, -3.2, -0.1), visible=False)
         self.left_arm = Entity(parent=self, model="assets/left_arm.obj",
                                texture="assets/arms_texture.png", shader=lit_with_shadows_shader)
         self.right_arm = duplicate(self.left_arm, model="assets/right_arm.obj", shader=lit_with_shadows_shader)
@@ -139,7 +140,6 @@ class FirstPersonController(Entity):
                        scale=0.15, position=(-0.8, 0.42 - (0.15 * i)))
             )
 
-
     def update(self):
         if self.movement_allowed is True:
             # Crouching
@@ -156,8 +156,8 @@ class FirstPersonController(Entity):
                 self.speed = self.walking_speed
 
             self.footstep_cooldown -= time.dt
-            if (held_keys[CONTROLS["forward"]] or held_keys[CONTROLS["backward"]] or held_keys[CONTROLS["right"]]\
-                or held_keys[CONTROLS["left"]]) and self.footstep_cooldown <= 0 and self.grounded is True:
+            if (held_keys[CONTROLS["forward"]] or held_keys[CONTROLS["backward"]] or held_keys[CONTROLS["right"]]
+                        or held_keys[CONTROLS["left"]]) and self.footstep_cooldown <= 0 and self.grounded is True:
                 self.footstep_sounds[randint(0, len(self.footstep_sounds) - 1)].play()
                 self.footstep_cooldown = (10 - self.speed) // 3
                 if self.footstep_cooldown < 0.5:
@@ -202,7 +202,7 @@ class FirstPersonController(Entity):
                         self.land()
                     self.grounded = True
                     # make sure it's not a wall and that the point is not too far up
-                    if ray.world_normal.y > .7 and ray.world_point.y - self.world_y < .5: # walk up slope
+                    if ray.world_normal.y > .7 and ray.world_point.y - self.world_y < .5:  # walk up slope
                         self.y = ray.world_point[1]
                     return
                 else:
@@ -284,7 +284,7 @@ if save_info["current_chapter"] == "01":
             # On player looking
             if self.being_aimed_at is True:
                 if distance(self, player) < 4 and is_door_opened is False:
-                    if not "key" in player.inventory:
+                    if "key" not in player.inventory:
                         player.title_message.text = TRANSLATION["Chapter01"]["door"]["unlocked"]
                     else:
                         player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) " + TRANSLATION["Chapter01"]["door"]["unlocked"])
@@ -303,9 +303,9 @@ if save_info["current_chapter"] == "01":
                     player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=1)
 
                 # Adds the title animation
-                #title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
+                # title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
                 title = Animation("assets/glitchy_title_transparent.gif", parent=camera.ui, visible=False, scale=(1.5, 0.3))
-                #author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
+                # author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
                 #                     visible=False, scale=(0.75, 0.25), y=-0.3)
                 author_name = Animation("assets/glitchy_author_name_transparent.gif", parent=camera.ui, visible=False, scale=(0.75, 0.1), y=-0.3)
                 """# Rotates the player completely if its rotation is not enough
@@ -324,7 +324,7 @@ if save_info["current_chapter"] == "01":
                 # If we try to open the door
                 if key == CONTROLS["interact"] and distance(self, player) < 4 and is_door_opened is False:
                     # If the player has no key : can't open door
-                    if not "key" in player.inventory:
+                    if "key" not in player.inventory:
                         self.audio_cant_open_door.play()
                     # Can open door
                     else:
@@ -425,6 +425,25 @@ if __name__ == "__main__":
     # Creates the player
     player = FirstPersonController()
     #EditorCamera()
+
+    # Generates the pauser
+    pauser = Entity(ignore_paused=True)
+    pauser_quad = Entity(parent=camera.ui, model="quad", color=color.rgba(0, 0, 0, 0), scale=4, ignore_paused=True)
+    pauser_text = Text(dedent(f"<scale:2>{TRANSLATION['overall']['game_paused']}<scale:1>"), origin=(0, 0),
+                       color=color.rgba(255, 255, 255, 0), font="assets/font/doctor_glitch/Doctor Glitch.otf",
+                       ignore_paused=True)
+
+    def pauser_input(key):
+        if key == CONTROLS["pause"]:
+            if not application.paused:
+                application.pause()
+            else:
+                application.resume()
+            pauser_quad.animate_color(color.rgba(0, 0, 0, 100 * application.paused), duration=1, curve=curve.linear)
+            pauser_text.animate_color(color.rgba(255, 255, 255, 255 * application.paused), duration=0.5,
+                                      curve=curve.linear)
+
+    pauser.input = pauser_input
 
     # Generates the given map
     map_entities = generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player)

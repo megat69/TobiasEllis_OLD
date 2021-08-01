@@ -18,6 +18,7 @@
       "interact": "e",
       "secondary_interaction": "f",
       "tertiary_interaction": "a",
+      "pause": "escape",
       "hold_crouch_and_sprint": true
     },
     "controller": {
@@ -32,6 +33,7 @@
       "interact": "gamepad b",
       "secondary_interaction": "gamepad left shoulder",
       "tertiary_interaction": "gamepad right shoulder",
+      "pause": "gamepad start",
       "hold_crouch_and_sprint": false,
       "invert_x_axis": false,
       "invert_y_axis": false
