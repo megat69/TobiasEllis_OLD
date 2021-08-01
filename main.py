@@ -12,7 +12,7 @@ from random import randint
 
 ################################################### INIT ###############################################################
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 DRUG_MODE = False
 
 # Loads the settings
