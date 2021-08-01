@@ -80,7 +80,7 @@ if save_info["current_chapter"] == "01":
 class FirstPersonController(Entity):
     def __init__(self):
         if CUSTOMIZATION_SETTINGS["crosshair_enabled"]:
-            self.cursor = Entity(parent=camera.ui, model='assets/crosshair.obj',
+            self.cursor = Entity(parent=camera.ui, model=f'assets/crosshair_{CUSTOMIZATION_SETTINGS["crosshair_model"]}.obj',
                                  color=color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"]),
                                  scale=0.008)
         super().__init__()

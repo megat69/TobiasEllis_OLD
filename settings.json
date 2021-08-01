@@ -42,7 +42,8 @@
   "customization": {
     "FPS_counter_visible": true,
     "crosshair_enabled": true,
-    "crosshair_RGBA": [0, 200, 0, 200]
+    "crosshair_RGBA": [0, 200, 0, 200],
+    "crosshair_model": "dot"
   },
   "graphics": {
     "FOV": 90,
