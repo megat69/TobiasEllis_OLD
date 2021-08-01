@@ -4,6 +4,7 @@ Game by megat69.
 from ursina import *
 from ursina.shaders import lit_with_shadows_shader, fxaa_shader, ssao_shader
 from ursina import curve
+from ursina.prefabs.memory_counter import MemoryCounter
 import json
 from pypresence import Presence
 from map_generator import generate_map
@@ -43,7 +44,7 @@ if CUSTOMIZATION_SETTINGS["FPS_counter_visible"] is True:
 else:
     window.fps_counter.visible = False
 window.exit_button.disabled = True
-application.development_mode = True
+application.development_mode = False
 if GRAPHICS["FXAA_antialiasing"] is True and GRAPHICS["SSAO"] is False:
     camera.shader = fxaa_shader
 elif GRAPHICS["FXAA_antialiasing"] is False and GRAPHICS["SSAO"] is True:
@@ -302,9 +303,11 @@ if save_info["current_chapter"] == "01":
                     player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=1)
 
                 # Adds the title animation
-                title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
-                author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
-                                     visible=False, scale=(0.75, 0.25), y=-0.3)
+                #title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
+                title = Animation("assets/glitchy_title_transparent.gif", parent=camera.ui, visible=False, scale=(1.5, 0.3))
+                #author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
+                #                     visible=False, scale=(0.75, 0.25), y=-0.3)
+                author_name = Animation("assets/glitchy_author_name_transparent.gif", parent=camera.ui, visible=False, scale=(0.75, 0.1), y=-0.3)
                 """# Rotates the player completely if its rotation is not enough
                 player.animate_rotation((0, 0, 0), duration=1)
                 player.camera_pivot.animate_rotation((0, 0, 0), duration=1)"""
@@ -402,9 +405,11 @@ if __name__ == "__main__":
                 rotation.text = f"Rot. : ({player.camera_pivot.rotation_x:.2f}, {player.rotation_y:.2f}, {player.camera_pivot.rotation_z:.2f})"
 
     if DEBUG_MODE:
-        coords = Text("Coords : ", position=(-0.5, 0.45), visible=False)
-        rotation = Text("Rot. : ", position=(-0.5, 0.41), visible=False)
         debug_enabled = False
+        coords = Text("Coords : ", position=(-0.5, 0.45), visible=debug_enabled)
+        rotation = Text("Rot. : ", position=(-0.5, 0.41), visible=debug_enabled)
+        memory_counter = MemoryCounter()
+        memory_counter.visible = debug_enabled
 
     def input(key):
         if key == "f3" and DEBUG_MODE is True:
@@ -412,6 +417,7 @@ if __name__ == "__main__":
             debug_enabled = not debug_enabled
             coords.visible = debug_enabled
             rotation.visible = debug_enabled
+            memory_counter.visible = debug_enabled
 
     if DRUG_MODE is True:
         awful_quad = Entity(parent=camera.ui, model="quad", color=color.white, scale=2)
@@ -421,16 +427,17 @@ if __name__ == "__main__":
     #EditorCamera()
 
     # Generates the given map
-    generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player)
+    map_entities = generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player)
 
     if save_info["current_chapter"] == "01":
         background_music = Audio("assets/music/piano_tension.mp3", autoplay=False, loop=True, volume=0.25)
         invoke(background_music.play, delay=0)
 
-        player.camera_pivot.rotation_x = 73.8
-        player.rotation_y = -6.77
-        player.toggle_crouch_stance(True)
-        player.movement_allowed = False
+        if DEBUG_MODE is False:
+            player.camera_pivot.rotation_x = 73.8
+            player.rotation_y = -6.77
+            player.toggle_crouch_stance(True)
+            player.movement_allowed = False
 
         is_door_opened = False
 
@@ -470,7 +477,8 @@ if __name__ == "__main__":
             invoke(setattr, player, "movement_allowed", True, delay=7.5)
 
         # Invoking cutscene after the chapter name announcement is finished
-        invoke(cutscene, delay=7.1)
+        if DEBUG_MODE is False:
+            invoke(cutscene, delay=7.1)
 
     # Printing out the chapter name
     chapter_title = Text(TRANSLATION["overall"]["chapter"] + " " + save_info['current_chapter'],
@@ -493,7 +501,6 @@ if __name__ == "__main__":
 
     for entity in (chapter_separator, chapter_title, chapter_name):
         destroy(entity, delay=10)
-
 
     # TODO : Dynamic LODs for wall textures
 

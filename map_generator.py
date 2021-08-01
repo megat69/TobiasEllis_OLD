@@ -71,6 +71,8 @@ def generate_map(file, scene, player=None):
 
             setattr(player, element, map_data["player"][element])
 
+    map_entities = {}
+
     # Adding the meshes to the map
     for mesh_name in map_data["meshes"]:
         mesh = map_data["meshes"][mesh_name]
@@ -96,17 +98,19 @@ def generate_map(file, scene, player=None):
 
         # Building the mesh
         if mesh["type"] == "entity":
-            Entity(parent=scene, **data)
+            map_entities[mesh_name] = Entity(parent=scene, **data)
         elif mesh["type"] == "DirectionalLight":
-            DirectionalLight(parent=scene, **data)
+            map_entities[mesh_name] = DirectionalLight(parent=scene, **data)
         elif mesh["type"] == "AmbientLight":
-            AmbientLight(parent=scene, **data)
+            map_entities[mesh_name] = AmbientLight(parent=scene, **data)
         elif mesh["type"] == "LoredObject":
             try:
-                LoredObject(player, object_lore=mesh["object_lore"],
+                map_entities[mesh_name] = LoredObject(player, object_lore=mesh["object_lore"],
                             distance_to_entity=mesh["distance_to_entity"], parent=scene, **data)
             except Exception as e:
                 print(mesh)
                 raise e
         else:
             raise Exception("Mesh type not supported.")
+
+    return map_entities
