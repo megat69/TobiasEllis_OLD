@@ -1,6 +1,6 @@
 {
   "fullscreen": true,
-  "framerate_cap": null,
+  "framerate_cap": 9999,
   "rich_presence_enabled": true,
   "sensitivity": 100,
   "language": "en",

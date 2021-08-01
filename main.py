@@ -57,7 +57,7 @@ else:
 
 # Caps the framerate if wanted
 if settings["framerate_cap"] is not None:
-    from panda3d.core import ClockObject, globalClock
+    from panda3d.core import ClockObject
     globalClock.setMode(ClockObject.MLimited)
     globalClock.setFrameRate(settings["framerate_cap"])
 
@@ -403,6 +403,9 @@ if __name__ == "__main__":
             if debug_enabled:
                 coords.text = f"Coords : ({player.x:.2f}, {player.y:.2f}, {player.z:.2f})"
                 rotation.text = f"Rot. : ({player.camera_pivot.rotation_x:.2f}, {player.rotation_y:.2f}, {player.camera_pivot.rotation_z:.2f})"
+                cpu_percent = str(psutil.cpu_percent())
+                if cpu_percent != "0.0":
+                    cpu_counter.text = "CPU : " + cpu_percent
 
     if DEBUG_MODE:
         debug_enabled = False
@@ -410,6 +413,8 @@ if __name__ == "__main__":
         rotation = Text("Rot. : ", position=(-0.5, 0.41), visible=debug_enabled)
         memory_counter = MemoryCounter()
         memory_counter.visible = debug_enabled
+        import psutil
+        cpu_counter = Text("CPU : ", position=(-0.5, 0.37), visible=debug_enabled)
 
     def input(key):
         if key == "f3" and DEBUG_MODE is True:
@@ -418,6 +423,7 @@ if __name__ == "__main__":
             coords.visible = debug_enabled
             rotation.visible = debug_enabled
             memory_counter.visible = debug_enabled
+            cpu_counter.visible = debug_enabled
 
     if DRUG_MODE is True:
         awful_quad = Entity(parent=camera.ui, model="quad", color=color.white, scale=2)
