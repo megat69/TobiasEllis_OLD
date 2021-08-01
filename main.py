@@ -14,7 +14,7 @@ import ast
 
 ################################################### INIT ###############################################################
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 DRUG_MODE = False
 
 # Loads the settings
@@ -711,6 +711,7 @@ if __name__ == "__main__":
         destroy(entity, delay=10)
 
     # TODO : Dynamic LODs for wall textures
+    # TODO : Press escape to start
 
     # Runs the app
     invoke(application.pause, delay=0.2)
