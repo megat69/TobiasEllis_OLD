@@ -432,7 +432,7 @@ if __name__ == "__main__":
     player = FirstPersonController()
     #EditorCamera()
 
-    # Generates the pauser
+    # Generates the pause menu
     pauser = Entity(ignore_paused=True)
     pauser_quad = Entity(parent=camera.ui, model="quad", color=color.rgba(0, 0, 0, 0), scale=4, ignore_paused=True)
     pauser_text = Text(dedent(f"<scale:2>{TRANSLATION['overall']['game_paused']}<scale:1>"), origin=(0, 0),
@@ -445,6 +445,8 @@ if __name__ == "__main__":
                 application.pause()
             else:
                 application.resume()
+                mouse.position = (0, 0)
+            mouse.locked = not application.paused
             pauser_quad.animate_color(color.rgba(0, 0, 0, 100 * application.paused), duration=1, curve=curve.linear)
             pauser_text.animate_color(color.rgba(255, 255, 255, 255 * application.paused), duration=0.5,
                                       curve=curve.linear)
