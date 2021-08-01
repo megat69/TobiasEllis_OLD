@@ -1,6 +1,6 @@
 {
   "fullscreen": true,
-  "framerate_cap": 9999,
+  "framerate_cap": null,
   "rich_presence_enabled": true,
   "sensitivity": 100,
   "language": "en",
@@ -22,7 +22,10 @@
       "hold_crouch_and_sprint": true
     },
     "controller": {
-      "sensitivity": [90, 100],
+      "sensitivity": [
+        90,
+        100
+      ],
       "forward": "gamepad left stick y",
       "backward": 0,
       "left": 0,
@@ -42,7 +45,12 @@
   "customization": {
     "FPS_counter_visible": true,
     "crosshair_enabled": true,
-    "crosshair_RGBA": [0, 200, 0, 200],
+    "crosshair_RGBA": [
+      0,
+      200,
+      0,
+      200
+    ],
     "crosshair_model": "dot"
   },
   "graphics": {

@@ -9,6 +9,8 @@ import json
 from pypresence import Presence
 from map_generator import generate_map
 from random import randint
+from functools import partial
+import ast
 
 ################################################### INIT ###############################################################
 
@@ -439,17 +441,196 @@ if __name__ == "__main__":
                        color=color.rgba(255, 255, 255, 0), font="assets/font/doctor_glitch/Doctor Glitch.otf",
                        ignore_paused=True)
 
+    # Buttons for the settings
+    settings_button = Button(parent=camera.ui, text="Settings", position=(0, -0.1), ignore_paused=True,
+                             visible=False, scale=(0.2, 0.05))
+    settings_pages = {
+        "General": {
+            "__main__": Entity(parent=camera.ui, model="quad", visible=False, color=color.black33)
+        },
+        "Controls": {
+            "__main__": Entity(parent=camera.ui, model="quad", visible=False, color=color.black33)
+        },
+        "Customization": {
+            "__main__": Entity(parent=camera.ui, model="quad", visible=False, color=color.black33)
+        },
+        "Graphics": {
+            "__main__": Entity(parent=camera.ui, model="quad", visible=False, color=color.black33)
+        }
+    }
+    current_settings_page = "General"
+    settings_pages_buttons = [
+        Button(parent=camera.ui, text=value, position=window.left-Vec2(0, (i/10)-0.2), ignore_paused=True,
+               visible=False, scale=(0.2, 0.05), origin=(-1, 0))\
+        for i, value in enumerate(settings_pages)
+    ]
+
+    def save_settings():
+        """
+        Saves the settings.
+        """
+        # Loads all the settings from the variables
+        all_setting_pages = [i for i in settings_pages]
+        for page, setting_var in ((all_setting_pages[i],
+                                   (settings, CONTROLS, CUSTOMIZATION_SETTINGS, GRAPHICS)[i]) for i in range(4)):
+            for setting in settings_pages[page]:
+                if setting == "__main__": continue
+                if setting.endswith("_input"): continue
+                try:
+                    if settings_pages[page][setting + "_input"].text == "": continue
+                except Exception:
+                    pass
+                if isinstance(setting_var[setting], str):
+                    setting_var[setting] = settings_pages[page][setting + "_input"].text
+                elif isinstance(setting_var[setting], int) and not isinstance(setting_var[setting], bool):
+                    setting_var[setting] = int(settings_pages[page][setting + "_input"].text)
+                elif isinstance(setting_var[setting], float):
+                    setting_var[setting] = float(settings_pages[page][setting + "_input"].text)
+                elif isinstance(setting_var[setting], (list, tuple)):
+                    setting_var[setting] = ast.literal_eval(settings_pages[page][setting + "_input"].text)
+
+        # Dumps the settings to the file
+        with open("settings.json", "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2)
+        print("Settings saved !")
+
+    settings_save_button = Button(parent=camera.ui, text="SAVE", position=window.bottom_left+Vec2(0.2, 0.1),
+                                  ignore_paused=True, visible=False, scale=(0.2, 0.05))
+    settings_save_button.on_click = save_settings
+
+    class Checkbox(Button):
+        """
+        A checkbox.
+        """
+        def __init__(self, checked:bool=False, linked_var=None, linked_fx=None, **kwargs):
+            kwargs.setdefault("model", "quad")
+            kwargs.setdefault("parent", camera.ui)
+            kwargs.setdefault("scale", 0.02)
+            kwargs.setdefault("color", color.lime if checked else color.red)
+            kwargs.setdefault("pressed_color", color.lime if checked else color.red)
+            kwargs.setdefault("highlight_color", color.lime if checked else color.red)
+            super().__init__(**kwargs)
+            self.checked = checked
+            self.linked_var = linked_var
+            self.linked_fx = linked_fx
+
+        def on_click(self):
+            self.checked = not self.checked
+            self.pressed_color = color.lime if self.checked else color.red
+            self.highlight_color = color.lime if self.checked else color.red
+            self.color = color.lime if self.checked else color.red
+
+            # If a variable is linked to it
+            self.linked_var = self.checked
+            if self.linked_fx is not None:
+                self.linked_fx(self.checked)
+
+        def value(self):
+            return self.checked
+
+    def set_settings_value(settings_var, name, value):
+        global settings
+        settings_var[name] = value
+
+    # Generating the settings page for each of them
+    for setting_name, setting_var in (("General", settings), ("Controls", CONTROLS),
+                                      ("Customization", CUSTOMIZATION_SETTINGS), ("Graphics", GRAPHICS)):
+        for i, name in enumerate(setting_var):
+            # Forgetting this one if it is a dict (it has another page)
+            if isinstance(setting_var[name], dict): continue
+
+            # Otherwise, creating an entity for it
+            settings_pages[setting_name][name] = Text(parent=settings_pages[setting_name]["__main__"],
+                                                   text=name[0].upper() + name[1:].replace("_", " ") + " : ",
+                                                   position=(-0.45, -i/20 + 0.45), color=color.white)
+            # And its input version
+            if not isinstance(setting_var[name], bool):
+                content_limit = None
+                if isinstance(setting_var[name], int):
+                    content_limit = "0123456789"
+                elif isinstance(setting_var[name], float):
+                    content_limit = "0123456789."
+                settings_pages[setting_name][name + "_input"] = InputField(parent=settings_pages[setting_name]["__main__"],
+                                                                        position=(0.2, -i/20 + 0.45), ignore_paused=True,
+                                                                        limit_content_to=content_limit)
+                settings_pages[setting_name][name + "default_input"] = Text(parent=settings_pages[setting_name]["__main__"],
+                                                                         position=(-0.2, -i / 20 + 0.45),
+                                                                         ignore_paused=True,
+                                                                         text="Default : " + str(setting_var[name]))
+            else:
+                settings_pages[setting_name][name + "_input"] = Checkbox(parent=settings_pages[setting_name]["__main__"],
+                                                                      position=(0.2, -i / 20 + 0.45), ignore_paused=True,
+                                                                      checked=setting_var[name],
+                                                                      linked_fx=partial(set_settings_value, setting_var, name))
+
+
+    def open_settings_page(page:str="General"):
+        global current_settings_page
+        current_settings_page = page
+
+        # Hiding all the settings page except the good one
+        for setting_name in settings_pages:
+            settings_pages[setting_name]["__main__"].visible = setting_name == current_settings_page
+            settings_pages[setting_name]["__main__"].enabled = setting_name == current_settings_page
+
+
+    for i, page in enumerate(settings_pages):
+        settings_pages_buttons[i].on_click = partial(open_settings_page, page)
+
+    def open_settings():
+        """
+        Opens up the settings page.
+        """
+        # Removes visibility for the buttons that are not from the settings page.
+        for entity in (pauser_text, settings_button):
+            entity.visible = False
+
+        # Adds up all the buttons on the settings
+        for button in settings_pages_buttons:
+            button.visible = True
+            button.enabled = True
+
+        # Enables everything again
+        for setting in settings_pages:
+            for element in settings_pages[setting]:
+                settings_pages[setting][element].enabled = True
+
+        settings_save_button.visible = True
+
+    settings_button.on_click = open_settings
+
     def pauser_input(key):
+        """
+        Pauses/Unpauses the game.
+        """
         if key == CONTROLS["pause"]:
             if not application.paused:
                 application.pause()
             else:
                 application.resume()
+                # Placing the mouse back at the center of the screen so the player doesn't move when unpausing
                 mouse.position = (0, 0)
+                # Removing the settings buttons
+                for button in settings_pages_buttons:
+                    button.visible = False
+                    button.enabled = False
+                for setting in settings_pages:
+                    settings_pages[setting]["__main__"].visible = False
+                    for element in settings_pages[setting]:
+                        settings_pages[setting][element].enabled = False
+                    # Disables the input field if necessary (otherwise every key press in the game will be appended to
+                    # the input field)
+                    for input_field in settings_pages[setting]:
+                        if isinstance(settings_pages[setting][input_field], InputField):
+                            settings_pages[setting][input_field].active = False
+                settings_save_button.visible = False
             mouse.locked = not application.paused
             pauser_quad.animate_color(color.rgba(0, 0, 0, 100 * application.paused), duration=1, curve=curve.linear)
             pauser_text.animate_color(color.rgba(255, 255, 255, 255 * application.paused), duration=0.5,
                                       curve=curve.linear)
+            pauser_text.visible = True
+            settings_button.visible = application.paused
+            settings_button.enabled = application.paused
 
     pauser.input = pauser_input
 
@@ -532,4 +713,5 @@ if __name__ == "__main__":
     # TODO : Dynamic LODs for wall textures
 
     # Runs the app
+    invoke(application.pause, delay=0.2)
     app.run()
