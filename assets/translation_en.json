@@ -3,7 +3,8 @@
     "double_shaders_error": "You cannot use both FXAA and SSAO at once. Please disable one of them.",
     "RPC_disabled": "Rich Presence has been disabled, since the following error occurred :",
     "chapter": "Chapter",
-    "game_paused": "Game paused."
+    "game_paused": "Game paused.",
+    "press_escape_to_start": "Press {} to start"
   },
   "Chapter01": {
     "chapter_name": "Awakening",

@@ -2,7 +2,6 @@
   "fullscreen": true,
   "framerate_cap": null,
   "rich_presence_enabled": true,
-  "sensitivity": 100,
   "language": "en",
   "controls": {
     "use_controller": false,

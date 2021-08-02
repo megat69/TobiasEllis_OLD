@@ -54,7 +54,19 @@ class LoredObject(Button):
         self.player.title_message.text = ""
         self.player.title_message.x = 0
 
-def generate_map(file, scene, player=None):
+class LightIndicator(Entity):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.blink_cooldown = 1
+
+    def update(self):
+        self.blink_cooldown -= time.dt
+        if self.blink_cooldown <= 0:
+            self.animate_color(color.white, duration=0.8)
+            invoke(self.animate_color, color.black, duration=0.2, delay=0.8)
+            self.blink_cooldown = 1
+
+def generate_map(file, scene, player=None, debug:bool=False):
     """
     Generates a map for an Ursina scene from a file.
     :param file: The JSON file containing the map.
@@ -72,6 +84,8 @@ def generate_map(file, scene, player=None):
             setattr(player, element, map_data["player"][element])
 
     map_entities = {}
+    if debug is True:
+        debug_entities = []
 
     # Adding the meshes to the map
     for mesh_name in map_data["meshes"]:
@@ -84,16 +98,19 @@ def generate_map(file, scene, player=None):
             if isinstance(data[key], list):
                 data[key] = tuple(data[key])
             # Colors become... Well, real colors.
-            if key == "color":
+            if key in ("color", "pressed_color", "highlight_color"):
                 if isinstance(data[key], str):
                     data[key] = getattr(color, data[key])
                 elif data[key]["type"].lower() == "rgb":
                     data[key] = color.rgb(*data[key]["value"])
+                elif data[key]["type"].lower() == "rgba":
+                    data[key] = color.rgba(*data[key]["value"])
                 elif data[key]["type"].lower() == "hsv":
                     data[key] = color.color(*data[key]["value"])
                 else:
                     raise Exception("Color format not supported !")
-            elif key == "shader" and mesh["type"] in ("entity", "LoredObject"):
+            if key == "shader" and mesh["type"] in ("entity", "LoredObject"):
+                print(mesh_name, data[key])
                 data[key] = lit_with_shadows_shader if data[key] is True else None
 
         # Building the mesh
@@ -103,6 +120,8 @@ def generate_map(file, scene, player=None):
             map_entities[mesh_name] = DirectionalLight(parent=scene, **data)
         elif mesh["type"] == "AmbientLight":
             map_entities[mesh_name] = AmbientLight(parent=scene, **data)
+        elif mesh["type"] == "SpotLight":
+            map_entities[mesh_name] = SpotLight(parent=scene, **data)
         elif mesh["type"] == "LoredObject":
             try:
                 map_entities[mesh_name] = LoredObject(player, object_lore=mesh["object_lore"],
@@ -112,5 +131,9 @@ def generate_map(file, scene, player=None):
                 raise e
         else:
             raise Exception("Mesh type not supported.")
+
+        if "light" in mesh["type"].lower() and debug is True:
+            debug_entities.append(LightIndicator(parent=scene, position=data["position"], rotation=data["rotation"],
+                                                 model="assets/icons/Low_Poly_Light_Bulb.fbx", scale=1.5))
 
     return map_entities

@@ -7,7 +7,7 @@
       "type": "DirectionalLight",
       "data": {
         "shadows": true,
-        "y": 0.2,
+        "position": [0, 0.2, 0],
         "rotation": [270, 0, 0],
         "color": {
           "type": "rgb",
@@ -64,8 +64,9 @@
           "value": [0, 80, 10]
         },
         "position": [0, -1.35, 0.5],
-        "shader": true,
-        "collider": "plane"
+        "collider": "plane",
+        "pressed_color": "white",
+        "shader": true
       },
       "object_lore": "TRANSLATION->broken_wine_bottle",
       "distance_to_entity": 2
@@ -78,8 +79,8 @@
         "scale": 15,
         "position": [-7.5, -3, 0],
         "rotation": [0, 0, 90],
-        "shader": true,
-        "collider": "plane"
+        "collider": "plane",
+        "shader": true
       }
     },
     "right_wall": {
@@ -90,8 +91,8 @@
         "scale": 15,
         "position": [7.5, -3, 0],
         "rotation": [0, 180, 90],
-        "shader": true,
-        "collider": "plane"
+        "collider": "plane",
+        "shader": true
       }
     },
     "front_wall": {
@@ -102,8 +103,8 @@
         "scale": 15,
         "position": [0, -3, 7.5],
         "rotation": [90, 180, 0],
-        "shader": true,
-        "collider": "plane"
+        "collider": "plane",
+        "shader": true
       }
     },
     "back_wall": {
@@ -114,8 +115,8 @@
         "scale": 15,
         "position": [0, -3, -7.5],
         "rotation": [90, 0, 0],
-        "shader": true,
-        "collider": "plane"
+        "collider": "plane",
+        "shader": true
       }
     },
     "roof": {
@@ -138,9 +139,10 @@
         "position": [4, -3.05, -3],
         "scale": 1.5,
         "rotation": [5, 0, 0],
-        "shader": true,
         "collider": "mesh",
-        "color": "white"
+        "color": "white",
+        "pressed_color": "white",
+        "shader": true
       },
       "object_lore": "TRANSLATION->knocked_out_man",
       "distance_to_entity": 3
@@ -152,9 +154,10 @@
         "texture": "assets/Chapter01/knife/knife_texture.png",
         "position": [4.8, -3, -3],
         "rotation": [90, 0, 0],
-        "shader": true,
         "scale": 0.15,
-        "color": "white"
+        "color": "white",
+        "pressed_color": "white",
+        "shader": true
       },
       "object_lore": "TRANSLATION->knife",
       "distance_to_entity": 3.5
@@ -165,8 +168,8 @@
         "model": "assets/Chapter01/door/door_frame.obj",
         "texture": "assets/Chapter01/door/door_frame_texture.jpg",
         "position": [0, -3, 7.5],
-        "shader": true,
-        "scale": 0.6
+        "scale": 0.6,
+        "shader": true
       }
     },
     "wardrobe": {
@@ -174,9 +177,9 @@
       "data": {
         "model": "assets/Chapter01/decoration/wardrobe/wardrobe",
         "texture": "assets/Chapter01/decoration/wardrobe/wardrobe_texture.jpg",
-        "shader": true,
         "position": [6, -3, -6.5],
-        "collider": "box"
+        "collider": "box",
+        "shader": true
       }
     },
     "bookshelf": {
@@ -184,9 +187,9 @@
       "data": {
         "model": "assets/Chapter01/decoration/bookshelf/bookshelf",
         "texture": "assets/Chapter01/decoration/bookshelf/bookshelf_texture.png",
-        "shader": true,
         "position": [3.5, -3, -7],
-        "collider": "box"
+        "collider": "box",
+        "shader": true
       }
     },
     "armoire": {
@@ -194,10 +197,10 @@
       "data": {
         "model": "assets/Chapter01/decoration/armoire/armoire.obj",
         "texture": "assets/Chapter01/decoration/armoire/armoire_texture.png",
-        "shader": true,
         "position": [-6.5, -2.7, -6.5],
         "rotation": [0, 90, 0],
-        "collider": "box"
+        "collider": "box",
+        "shader": true
       }
     },
     "carpet": {
@@ -205,10 +208,10 @@
       "data": {
         "model": "assets/Chapter01/decoration/carpet/carpet.fbx",
         "texture": "assets/Chapter01/decoration/carpet/carpet_texture.jpg",
-        "shader": true,
         "position": [-3.2, -2.96, 0],
         "rotation": [180, 0, 0],
-        "scale": 0.002
+        "scale": 0.002,
+        "shader": true
       }
     },
     "sink": {
@@ -216,11 +219,11 @@
       "data": {
         "model": "assets/Chapter01/decoration/sink/sink.obj",
         "texture": "assets/Chapter01/decoration/sink/sink_texture.png",
-        "shader": true,
         "position": [-7, -3, 0],
         "rotation": [0, 90, 0],
         "scale": 0.02,
-        "collider": "box"
+        "collider": "box",
+        "shader": true
       }
     },
     "dresser": {
@@ -228,10 +231,10 @@
       "data": {
         "model": "assets/Chapter01/decoration/dresser/dresser",
         "texture": "assets/Chapter01/decoration/dresser/dresser_texture.png",
-        "shader": true,
         "position": [7.3, -3, 0],
         "rotation": [0, 270, 0],
-        "collider": "box"
+        "collider": "box",
+        "shader": true
       }
     },
     "window": {
@@ -239,21 +242,29 @@
       "data": {
         "model": "assets/Chapter01/decoration/window/window.obj",
         "texture": "assets/Chapter01/decoration/window/window_texture.png",
-        "shader": true,
         "position": [7.4, -1, 2.5],
-        "rotation": [0, 90, 0]
+        "rotation": [0, 90, 0],
+        "shader": true
       }
-    }
-  },
-  "paper": {
-    "type": "LoredObject",
-    "object_lore": "TRANSLATION->paper",
-    "distance_to_entity": 2,
-    "data": {
-      "model": "plane",
-      "scale": 0.2,
-      "position": [2, -2.98, 0],
-      "color": "white"
+    },
+    "paper": {
+      "type": "LoredObject",
+      "object_lore": "TRANSLATION->paper",
+      "distance_to_entity": 2.5,
+      "data": {
+        "model": "assets/Chapter01/paper/paper.obj",
+        "texture": "assets/Chapter01/paper/paper_texture.jpg",
+        "scale": 0.02,
+        "position": [0, -2.98, 0],
+        "rotation": [0, 0, 0],
+        "color": {
+          "type": "rgb",
+          "value": [255, 255, 255, 255]
+        },
+        "pressed_color": "white",
+        "collider": "mesh",
+        "shader": true
+      }
     }
   }
 }

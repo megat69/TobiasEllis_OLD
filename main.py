@@ -287,7 +287,7 @@ if save_info["current_chapter"] == "01":
             if self.being_aimed_at is True:
                 if distance(self, player) < 4 and is_door_opened is False:
                     if "key" not in player.inventory:
-                        player.title_message.text = TRANSLATION["Chapter01"]["door"]["unlocked"]
+                        player.title_message.text = TRANSLATION["Chapter01"]["door"]["locked"]
                     else:
                         player.title_message.text = dedent(f"(<lime>{CONTROLS['interact'].upper()}<default>) " + TRANSLATION["Chapter01"]["door"]["unlocked"])
                     player.title_message.origin = (0,0)
@@ -398,9 +398,11 @@ if __name__ == "__main__":
                 RICH_PRESENCE_ENABLED = False
                 print("Rich Presence has been disabled, since the following error occurred :", e)
 
+        # Drug mode xD
         if DRUG_MODE is True:
             awful_quad.color = color.rgb(randint(0, 255), randint(0, 255), randint(0, 255), 100)
 
+        # Updating debug info
         if DEBUG_MODE is True:
             if debug_enabled:
                 coords.text = f"Coords : ({player.x:.2f}, {player.y:.2f}, {player.z:.2f})"
@@ -606,6 +608,11 @@ if __name__ == "__main__":
         if key == CONTROLS["pause"]:
             if not application.paused:
                 application.pause()
+                if player.title_message.text == dedent(TRANSLATION["overall"]["press_escape_to_start"].format(
+                    "<green>" + CONTROLS["pause"] + "<default>")):
+                    player.title_message.animate_color(color.rgba(255, 255, 255, 0), duration=0.5)
+                    invoke(setattr, player.title_message, "text", "", delay=0.51)
+                    invoke(setattr, player.title_message, "color", color.white, delay=0.51)
             else:
                 application.resume()
                 # Placing the mouse back at the center of the screen so the player doesn't move when unpausing
@@ -635,7 +642,7 @@ if __name__ == "__main__":
     pauser.input = pauser_input
 
     # Generates the given map
-    map_entities = generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player)
+    map_entities = generate_map(f"assets/Chapter_{save_info['current_chapter']}_map.json", scene, player, debug=DEBUG_MODE)
 
     if save_info["current_chapter"] == "01":
         background_music = Audio("assets/music/piano_tension.mp3", autoplay=False, loop=True, volume=0.25)
@@ -711,8 +718,11 @@ if __name__ == "__main__":
         destroy(entity, delay=10)
 
     # TODO : Dynamic LODs for wall textures
-    # TODO : Press escape to start
+    # TODO : Settings menu for controller
 
     # Runs the app
+    player.title_message.text = dedent(TRANSLATION["overall"]["press_escape_to_start"].format(
+        "<green>"+CONTROLS["pause"]+"<default>"))
+    player.title_message.origin = (0, 0)
     invoke(application.pause, delay=0.2)
     app.run()
