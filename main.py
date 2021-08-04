@@ -609,7 +609,7 @@ if __name__ == "__main__":
             if not application.paused:
                 application.pause()
                 if player.title_message.text == dedent(TRANSLATION["overall"]["press_escape_to_start"].format(
-                    "<green>" + CONTROLS["pause"] + "<default>")):
+                    "<green>" + CONTROLS["pause"].upper() + "<default>")):
                     player.title_message.animate_color(color.rgba(255, 255, 255, 0), duration=0.5)
                     invoke(setattr, player.title_message, "text", "", delay=0.51)
                     invoke(setattr, player.title_message, "color", color.white, delay=0.51)
@@ -722,7 +722,7 @@ if __name__ == "__main__":
 
     # Runs the app
     player.title_message.text = dedent(TRANSLATION["overall"]["press_escape_to_start"].format(
-        "<green>"+CONTROLS["pause"]+"<default>"))
+        "<green>"+CONTROLS["pause"].upper()+"<default>"))
     player.title_message.origin = (0, 0)
     invoke(application.pause, delay=0.2)
     app.run()
