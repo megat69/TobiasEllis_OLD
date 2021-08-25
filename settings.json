@@ -3,6 +3,7 @@
   "framerate_cap": null,
   "rich_presence_enabled": true,
   "language": "en",
+  "RAM_saving_mode": false,
   "controls": {
     "use_controller": false,
     "mouse_and_keyboard": {

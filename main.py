@@ -305,20 +305,31 @@ if save_info["current_chapter"] == "01":
                     player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=1)
 
                 # Adds the title animation
-                # title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
-                title = Animation("assets/glitchy_title_transparent.gif", parent=camera.ui, visible=False, scale=(1.5, 0.3))
-                # author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
-                #                     visible=False, scale=(0.75, 0.25), y=-0.3)
-                author_name = Animation("assets/glitchy_author_name_transparent.gif", parent=camera.ui, visible=False, scale=(0.75, 0.1), y=-0.3)
+                if settings["RAM_saving_mode"] is True:
+                    title = Entity(parent=camera.ui, model="quad", texture="assets/title.png", visible=False, scale=(1.5, 0.5))
+                    author_name = Entity(parent=camera.ui, model="quad", texture="assets/author_name.png",
+                                        visible=False, scale=(0.75, 0.25), y=-0.3)
+                else:
+                    title = Animation("assets/glitchy_title_transparent.gif", parent=camera.ui, visible=False, scale=(1.5, 0.3))
+                    author_name = Animation("assets/glitchy_author_name_transparent.gif", parent=camera.ui, visible=False, scale=(0.75, 0.1), y=-0.3)
                 """# Rotates the player completely if its rotation is not enough
                 player.animate_rotation((0, 0, 0), duration=1)
                 player.camera_pivot.animate_rotation((0, 0, 0), duration=1)"""
                 # Animates the player visibility
-                invoke(setattr, title, "visible", True, delay=7)
-                invoke(setattr, author_name, "visible", True, delay=9.6)
-                invoke(setattr, author_name, "visible", False, delay=14.6)
-                invoke(setattr, title, "visible", False, delay=16.9)
-                invoke(intro_music.fade_out, duration=3, delay=21)
+                title_sequence = Sequence(
+                    7,
+                    Func(setattr, title, "visible", True),
+                    2.6,
+                    Func(setattr, author_name, "visible", True),
+                    5,
+                    Func(setattr, author_name, "visible", False),
+                    2.3,
+                    Func(setattr, title, "visible", False),
+                    4.1,
+                    Func(intro_music.fade_out, duration=3, delay=21),
+                    loop=False
+                )
+                title_sequence.start()
 
         def input(self, key):
             if self.hovered:
@@ -665,31 +676,40 @@ if __name__ == "__main__":
 
         # Cutscene
         def cutscene():
+            cutscene_sequence = Sequence(
+                # First camera rotation (waking up)
+                Func(player.camera_pivot.animate_rotation, (54.3, 0, 0), duration=3, curve=curve.linear),
+                Func(setattr, player.title_message, "text", TRANSLATION["Chapter01"]["cutscene_dialogs"][0]),
+                Func(setattr, player.title_message, "origin", (0, 0)),
+                3,
+                # Turning the head towards the corpse
+                Func(player.camera_pivot.animate_rotation, (19, 103, 0), duration=1.4, curve=curve.in_back),
+                0.5,
+                Func(setattr, player.title_message, "text", TRANSLATION["Chapter01"]["cutscene_dialogs"][1]),
+                Func(setattr, player.title_message, "origin", (0, 0)),
+                # Beginning to get up
+                2,
+                Func(player.camera_pivot.animate_rotation, (48, 0, 0), duration=1, curve=curve.linear),
+                Func(player.animate_rotation, (0, 88, 0), duration=1, curve=curve.linear),
+                Func(setattr, player.title_message, "text", ""),
+                # Getting up
+                1,
+                Func(player.camera_pivot.animate_rotation, (0, 0, 0), duration=1, curve=curve.linear),
+                Func(player.animate_rotation, (0, 80, 0), duration=1, curve=curve.linear),
+                0.5,
+                Func(player.toggle_crouch_stance, False),
+                # Player can move
+                0.5,
+                Func(setattr, player, "movement_allowed", True)
+            )
+
             # Removing crosshair
             if CUSTOMIZATION_SETTINGS["crosshair_enabled"] is True:
                 player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=0.2)
                 invoke(player.cursor.animate_color, color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"]), duration=0.5,
                        delay=8)
 
-            # First camera rotation (waking up)
-            invoke(player.camera_pivot.animate_rotation, (54.3, 0, 0), duration=3, curve=curve.linear)
-            invoke(setattr, player.title_message, "text", TRANSLATION["Chapter01"]["cutscene_dialogs"][0])
-            invoke(setattr, player.title_message, "origin", (0, 0))
-            # Turning the head towards the corpse
-            invoke(player.camera_pivot.animate_rotation, (19, 103, 0), delay=3, duration=1.4, curve=curve.in_back)
-            invoke(setattr, player.title_message, "text", TRANSLATION["Chapter01"]["cutscene_dialogs"][1], delay=3.5)
-            invoke(setattr, player.title_message, "origin", (0, 0), delay=3.5)
-            # Beginning to get up
-            invoke(player.camera_pivot.animate_rotation, (48, 0, 0), delay=5.5, duration=1, curve=curve.linear)
-            invoke(player.animate_rotation, (0, 88, 0), delay=5.5, duration=1, curve=curve.linear)
-            invoke(setattr, player.title_message, "text", "", delay=5.5)
-            # Getting up
-            invoke(player.camera_pivot.animate_rotation, (0, 0, 0), delay=6.5, duration=1, curve=curve.linear)
-            invoke(player.animate_rotation, (0, 80, 0), delay=6.5, duration=1, curve=curve.linear)
-            invoke(player.toggle_crouch_stance, False, delay=7)
-            # invoke(player.animate_position, (-3.77585, -2, -3.4301), delay=5.5, duration=1, curve=curve.linear)
-            # Player can move
-            invoke(setattr, player, "movement_allowed", True, delay=7.5)
+            cutscene_sequence.start()
 
         # Invoking cutscene after the chapter name announcement is finished
         if DEBUG_MODE is False:
