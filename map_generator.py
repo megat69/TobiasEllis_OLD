@@ -122,6 +122,8 @@ def generate_map(file, scene, player=None, debug:bool=False):
             map_entities[mesh_name] = AmbientLight(parent=scene, **data)
         elif mesh["type"] == "SpotLight":
             map_entities[mesh_name] = SpotLight(parent=scene, **data)
+        elif mesh["type"] == "PointLight":
+            map_entities[mesh_name] = PointLight(parent=scene, **data)
         elif mesh["type"] == "LoredObject":
             try:
                 map_entities[mesh_name] = LoredObject(player, object_lore=mesh["object_lore"],

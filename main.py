@@ -14,7 +14,7 @@ import ast
 
 ################################################### INIT ###############################################################
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 DRUG_MODE = False
 
 # Loads the settings
@@ -103,7 +103,7 @@ class FirstPersonController(Entity):
         # Character model
         # self.arms = Entity(parent=self, position=(0, -3.2, -0.1), visible=False)
         self.left_arm = Entity(parent=self, model="assets/left_arm.obj",
-                               texture="assets/arms_texture.png", shader=lit_with_shadows_shader)
+                               texture="assets/arms_texture.png", shader=lit_with_shadows_shader, always_on_top=True)
         self.right_arm = duplicate(self.left_arm, model="assets/right_arm.obj", shader=lit_with_shadows_shader)
         self.arms = (self.left_arm, self.right_arm)
 
@@ -300,6 +300,8 @@ if save_info["current_chapter"] == "01":
                 # Makes the inventory disappear
                 player.inventory_display[0].animate_color(color.rgb(0, 0, 0, 0), duration=1)
                 player.inventory.clear()
+                for arm in player.arms:
+                    arm.visible = False
                 # Makes the crosshair disappear
                 if CUSTOMIZATION_SETTINGS["crosshair_enabled"] is True:
                     player.cursor.animate_color(color.rgb(*CUSTOMIZATION_SETTINGS["crosshair_RGBA"][:-1], 0), duration=1)
@@ -312,11 +314,12 @@ if save_info["current_chapter"] == "01":
                 else:
                     title = Animation("assets/glitchy_title_transparent.gif", parent=camera.ui, visible=False, scale=(1.5, 0.3))
                     author_name = Animation("assets/glitchy_author_name_transparent.gif", parent=camera.ui, visible=False, scale=(0.75, 0.1), y=-0.3)
-                """# Rotates the player completely if its rotation is not enough
-                player.animate_rotation((0, 0, 0), duration=1)
-                player.camera_pivot.animate_rotation((0, 0, 0), duration=1)"""
+
                 # Animates the player visibility
                 title_sequence = Sequence(
+                    # Rotates the player completely if its rotation is not enough
+                    Func(player.animate_rotation, (0, 0, 0), duration=1),
+                    Func(player.camera_pivot.animate_rotation, (0, 0, 0), duration=1),
                     7,
                     Func(setattr, title, "visible", True),
                     2.6,
@@ -326,7 +329,9 @@ if save_info["current_chapter"] == "01":
                     2.3,
                     Func(setattr, title, "visible", False),
                     4.1,
-                    Func(intro_music.fade_out, duration=3, delay=21),
+                    Func(intro_music.fade_out, duration=3),
+                    4,
+                    Func(application.quit),  # TODO : Remove this
                     loop=False
                 )
                 title_sequence.start()

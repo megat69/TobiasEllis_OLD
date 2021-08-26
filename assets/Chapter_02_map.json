@@ -1,0 +1,99 @@
+{
+  "player": {
+    "position": [0, 0, 0]
+  },
+  "meshes": {
+    "lighting_hands": {
+      "type": "SpotLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [0, 0, 0],
+        "color": {
+          "type": "rgb",
+          "value": [255, 255, 255]
+        }
+      }
+    },
+    "lighting_down": {
+      "type": "DirectionalLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [270, 0, 0],
+        "color": {
+          "type": "rgb",
+          "value": [255, 255, 255]
+        }
+      }
+    },
+    "lighting_up": {
+      "type": "DirectionalLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [90, 0, 0],
+        "color": {
+          "type": "rgb",
+          "value": [100, 100, 100]
+        }
+      }
+    },
+    "lighting_right": {
+      "type": "DirectionalLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [0, 0, 0],
+        "color": {
+          "type": "rgb",
+          "value": [180, 180, 180]
+        }
+      }
+    },
+    "lighting_left": {
+      "type": "DirectionalLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [0, 90, 0],
+        "color": {
+          "type": "rgb",
+          "value": [182, 180, 182]
+        }
+      }
+    },
+    "lighting_back": {
+      "type": "DirectionalLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [0, 270, 0],
+        "color": {
+          "type": "rgb",
+          "value": [182, 180, 182]
+        }
+      }
+    },
+    "lighting_front": {
+      "type": "DirectionalLight",
+      "data": {
+        "shadows": true,
+        "position": [0, 2, 0],
+        "rotation": [0, 90, 0],
+        "color": {
+          "type": "rgb",
+          "value": [178, 178, 178]
+        }
+      }
+    },
+    "floor": {
+      "type": "entity",
+      "data": {
+        "model": "assets/Chapter02/floor.obj",
+        "collider": "mesh",
+        "texture": "assets/Chapter02/planks_wall_texture.jpg"
+      }
+    }
+  }
+}
