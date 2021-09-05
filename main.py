@@ -13,7 +13,6 @@ from functools import partial
 import ast
 
 ################################################### INIT ###############################################################
-
 DEBUG_MODE = True
 DRUG_MODE = False
 
